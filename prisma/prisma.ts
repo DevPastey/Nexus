@@ -15,7 +15,14 @@ const readDatabaseUrl = () => {
     throw new Error("DATABASE_URL must be a Postgres connection string");
   }
 
-  return databaseUrl;
+  const url = new URL(databaseUrl);
+  const sslMode = url.searchParams.get("sslmode");
+
+  if (sslMode === "prefer" || sslMode === "require" || sslMode === "verify-ca") {
+    url.searchParams.set("sslmode", "verify-full");
+  }
+
+  return url.toString();
 };
 
 const createPrismaClient = () => {
